@@ -1,0 +1,7 @@
+# crear coonfiguaciones basicas del proyecto
+npm init --yes 
+# poder usar import export
+npm i @babel/node @babel/core @babel/present-env @babel/cli -D
+# instalar express y socket.io
+npm i express && socket.io && nodemon && cors && node-fetch && express-fileupload  & dotenv
+# C:\Users\David\Videos\iVCam
