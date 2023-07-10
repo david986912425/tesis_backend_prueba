@@ -2,7 +2,7 @@ const express = require("express");
 const fileUpload = require('express-fileupload');
 const http = require("http");
 const cors = require('cors');
-const router = require('./routes/faceRoutes.js');
+const router = require('./src/routes/faceRoutes.js');
 require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
