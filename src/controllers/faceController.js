@@ -1,5 +1,5 @@
 const app = require("../firebase/firebase");
-const { subirArchivo } = require("../helpers/subir.archivo");
+const { subirArchivo , subirImagenReport } = require("../helpers/subir.archivo");
 const { uuid } = require('uuidv4');
 const moment = require("moment");
 
@@ -31,7 +31,7 @@ const agregarClient = async (req, res) => {
     active: true,
     };
 
-    const docRef = db.collection("usuarios").doc(); // Generar un ID único para el documento
+    const docRef = db.collection("usuarios").doc();
     await docRef.set(payload);
 
     return res.status(200).json({
@@ -77,7 +77,77 @@ const getClient = async (req, res) => {
     });
   }
 }
+const addreport = async (req, res) => {
+  try {
+    if (!req.files || Object.keys(req.files).length === 0 || !req.files.fotoReport) {
+      return res.status(400).json({
+        success: false,
+        msg: "No se encontro foto",
+      });
+    }
+    console.time();
+    const pathCompleto = await subirImagenReport(
+      req.files,
+      ["png", "jpg", "jpeg", "gif"],
+      "Reportes"
+    );
+    console.timeEnd();
+    const urlReportSinToken = pathCompleto.split('&')[0];
+    const fechaActual = moment().format('DD/MM/YYYY HH:mm:ss')
+    const payload = {
+      id: uuid(),
+      name: req.body.name,
+      fotoReport: urlReportSinToken,
+      fechaIngreso : fechaActual,
+      status: true,
+      };
+  
+      const docRef = db.collection("report").doc();
+      await docRef.set(payload);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Se agregó correctamente'
+      });
+
+  } catch (error) {
+    console.log(new Error(error));
+    return res.status(500).json({
+      success: false,
+      msg: "Error al agregar el reporte",
+    });
+  }
+}
+const getreport = async (req, res) => {
+  try {
+    const querySnapshot = await db.collection("report").get();
+    const datos = [];
+
+    querySnapshot.forEach((doc) => {
+      datos.push({
+        id: doc.data().id,
+        name: doc.data().name,
+        fotoReport: doc.data().fotoReport,
+        fechaIngreso: doc.data().fechaIngreso,
+        status: doc.data().status,
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      data : datos
+  });
+  } catch (error) {
+    console.log(new Error(error));
+    return res.status(500).json({
+      success: false,
+      msg: "Error para traer los datos de reporte",
+    });
+  }
+}
 module.exports = {
     agregarClient, 
-    getClient
+    getClient,
+    addreport,
+    getreport
 }
